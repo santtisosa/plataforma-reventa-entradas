@@ -47,8 +47,10 @@ backend/.env
 
 # Database
 *.db
+*.db-journal
 *.sqlite
 *.sqlite3
+*-journal
 postgres_data/
 
 # Docker

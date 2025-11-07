@@ -5,8 +5,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// NOTA: Usando SQLite para desarrollo local (sin Docker)
+// En producción se migrará a PostgreSQL
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -45,7 +47,7 @@ model Ticket {
   description   String?
   imageUrl      String?
 
-  status        TicketStatus @default(AVAILABLE)
+  status        String @default("AVAILABLE") // Valores: AVAILABLE, IN_ESCROW, SOLD, CANCELLED, EXPIRED
 
   sellerId      String
   seller        User     @relation("SellerTickets", fields: [sellerId], references: [id])
@@ -76,7 +78,7 @@ model Transaction {
   platformFee       Float
   sellerAmount      Float
 
-  status            TransactionStatus @default(PENDING)
+  status            String @default("PENDING") // Valores: PENDING, PAYMENT_RECEIVED, IN_ESCROW, COMPLETED, CANCELLED, REFUNDED, DISPUTED
 
   // Stripe Payment Intent
   stripePaymentIntentId String? @unique
@@ -94,23 +96,4 @@ model Transaction {
   @@index([status])
   @@index([buyerId])
   @@index([ticketId])
-}
-
-// Enums
-enum TicketStatus {
-  AVAILABLE
-  IN_ESCROW
-  SOLD
-  CANCELLED
-  EXPIRED
-}
-
-enum TransactionStatus {
-  PENDING           // Esperando pago del comprador
-  PAYMENT_RECEIVED  // Pago recibido, en escrow
-  IN_ESCROW         // Fondos en escrow, esperando confirmación
-  COMPLETED         // Transacción completada, fondos liberados al vendedor
-  CANCELLED         // Transacción cancelada
-  REFUNDED          // Reembolsado al comprador
-  DISPUTED          // En disputa
 }

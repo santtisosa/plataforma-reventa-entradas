@@ -7,7 +7,7 @@ API REST del backend para la plataforma de reventa de entradas con sistema de es
 - **Node.js** con **TypeScript**
 - **Express** como framework web
 - **Prisma** como ORM
-- **PostgreSQL** como base de datos
+- **SQLite** como base de datos (desarrollo) / **PostgreSQL** (producción futura)
 - **Stripe** para procesamiento de pagos
 - **JWT** para autenticación
 - **bcrypt** para hash de contraseñas
@@ -58,7 +58,7 @@ npm install
 ```env
 NODE_ENV=development
 PORT=5000
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/plataforma_reventa?schema=public"
+DATABASE_URL="file:./dev.db"
 JWT_SECRET=your-secret-key
 JWT_EXPIRES_IN=7d
 STRIPE_SECRET_KEY=sk_test_your_stripe_key
@@ -66,21 +66,19 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 FRONTEND_URL=http://localhost:3000
 ```
 
-3. Iniciar PostgreSQL con Docker:
+**Nota:** El proyecto usa SQLite para desarrollo local. Los datos se guardan en `backend/dev.db`. No se requiere Docker.
+
+3. Generar cliente de Prisma:
 ```bash
-# Desde la raíz del proyecto
-docker-compose up -d
+npx prisma generate
 ```
 
-4. Generar cliente de Prisma:
+4. Ejecutar migraciones:
 ```bash
-npm run prisma:generate
+npx prisma migrate dev --name init
 ```
 
-5. Ejecutar migraciones:
-```bash
-npm run prisma:migrate
-```
+Esto creará la base de datos SQLite en `backend/dev.db` con todas las tablas necesarias.
 
 ## Scripts Disponibles
 
