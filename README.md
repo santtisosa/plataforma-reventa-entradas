@@ -16,7 +16,7 @@ Marketplace seguro para la compraventa de entradas a eventos con sistema de pago
 - Node.js + TypeScript
 - Express
 - Prisma ORM
-- PostgreSQL
+- SQLite (desarrollo) / PostgreSQL (producción futura)
 - Stripe (pagos)
 - JWT (autenticación)
 - bcrypt
@@ -60,8 +60,9 @@ plataforma-reventa-entradas/
 ### Prerrequisitos
 
 - Node.js 18+ y npm
-- Docker y Docker Compose (para PostgreSQL)
 - Cuenta de Stripe (modo prueba)
+
+**Nota:** El proyecto usa SQLite para desarrollo local (no requiere Docker). Se migrará a PostgreSQL en producción.
 
 ### 1. Clonar el Repositorio
 
@@ -70,17 +71,7 @@ git clone <url-del-repo>
 cd plataforma-reventa-entradas
 ```
 
-### 2. Configurar Base de Datos
-
-Iniciar PostgreSQL con Docker:
-
-```bash
-docker-compose up -d
-```
-
-Esto creará una base de datos PostgreSQL en `localhost:5432`.
-
-### 3. Configurar Backend
+### 2. Configurar Backend
 
 ```bash
 cd backend
@@ -92,17 +83,20 @@ npm install
 cp .env.example .env
 
 # Editar .env con tus valores
+# - DATABASE_URL ya está configurado para SQLite (file:./dev.db)
 # - Cambiar JWT_SECRET
 # - Agregar tu STRIPE_SECRET_KEY
 # - Agregar tu STRIPE_WEBHOOK_SECRET
 ```
 
-Ejecutar migraciones de Prisma:
+Generar cliente y ejecutar migraciones de Prisma:
 
 ```bash
-npm run prisma:generate
-npm run prisma:migrate
+npx prisma generate
+npx prisma migrate dev --name init
 ```
+
+Esto creará la base de datos SQLite en `backend/dev.db`.
 
 Iniciar servidor de desarrollo:
 
@@ -112,7 +106,7 @@ npm run dev
 
 El backend estará disponible en `http://localhost:5000`
 
-### 4. Configurar Frontend
+### 3. Configurar Frontend
 
 ```bash
 cd frontend

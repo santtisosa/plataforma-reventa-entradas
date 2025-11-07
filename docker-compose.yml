@@ -1,24 +1,28 @@
-version: '3.8'
+# NOTA: Docker Compose temporalmente deshabilitado
+# Actualmente el proyecto usa SQLite para desarrollo local
+# Este archivo se reactivará cuando se migre a PostgreSQL en producción
 
-services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: plataforma-reventa-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: plataforma_reventa
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
-    driver: local
+# version: '3.8'
+#
+# services:
+#   postgres:
+#     image: postgres:16-alpine
+#     container_name: plataforma-reventa-db
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: postgres
+#       POSTGRES_DB: plataforma_reventa
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U postgres"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#
+# volumes:
+#   postgres_data:
+#     driver: local
