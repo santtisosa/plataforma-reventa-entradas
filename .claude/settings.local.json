@@ -3,7 +3,9 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(npm install:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(mkdir:*)",
+      "Bash(docker compose up -d)"
     ],
     "deny": [],
     "ask": []

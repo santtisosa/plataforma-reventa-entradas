@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// NOTA: Usando SQLite para desarrollo local (sin Docker)
+// En producción se migrará a PostgreSQL
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuario
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  name          String
+  phone         String?
+  verified      Boolean  @default(false)
+  stripeCustomerId String? @unique
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relaciones
+  ticketsSelling Ticket[]      @relation("SellerTickets")
+  ticketsBuying  Transaction[] @relation("BuyerTransactions")
+
+  @@map("users")
+}
+
+// Modelo de Entrada/Ticket
+model Ticket {
+  id            String   @id @default(uuid())
+  eventName     String
+  eventDate     DateTime
+  eventVenue    String
+  category      String
+  section       String?
+  row           String?
+  seat          String?
+  price         Float
+  quantity      Int      @default(1)
+  description   String?
+  imageUrl      String?
+
+  status        String @default("AVAILABLE") // Valores: AVAILABLE, IN_ESCROW, SOLD, CANCELLED, EXPIRED
+
+  sellerId      String
+  seller        User     @relation("SellerTickets", fields: [sellerId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relaciones
+  transactions  Transaction[]
+
+  @@map("tickets")
+  @@index([status])
+  @@index([sellerId])
+  @@index([eventDate])
+}
+
+// Modelo de Transacción (Escrow)
+model Transaction {
+  id                String   @id @default(uuid())
+
+  ticketId          String
+  ticket            Ticket   @relation(fields: [ticketId], references: [id])
+
+  buyerId           String
+  buyer             User     @relation("BuyerTransactions", fields: [buyerId], references: [id])
+
+  amount            Float
+  platformFee       Float
+  sellerAmount      Float
+
+  status            String @default("PENDING") // Valores: PENDING, PAYMENT_RECEIVED, IN_ESCROW, COMPLETED, CANCELLED, REFUNDED, DISPUTED
+
+  // Stripe Payment Intent
+  stripePaymentIntentId String? @unique
+  stripeTransferId      String? @unique
+
+  // Fechas importantes
+  escrowReleaseDate DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("transactions")
+  @@index([status])
+  @@index([buyerId])
+  @@index([ticketId])
+}
